@@ -41,14 +41,15 @@ $ oc adm policy add-cluster-role-to-user cluster-admin sunny
 
 
 6. Add the htpasswd into the OAuth config has htpasswd identity provider
-    1. Obtain the oauth config from OCP
+
+1. Obtain the oauth config from OCP
 
 ```
 $ oc get -o yaml oauth cluster > /tmp/oauth.yaml
 ```
 
 
-    2. Edit the oauth.yaml to add new identity provider as below
+2. Edit the oauth.yaml to add new identity provider as below
 
 ```
 - htpasswd:
@@ -60,7 +61,7 @@ $ oc get -o yaml oauth cluster > /tmp/oauth.yaml
 ```
 
 
-    3. Apply the newly updated resource 
+3. Apply the newly updated resource 
 
 ```
 $ oc replace -f /tmp/oauth.yaml

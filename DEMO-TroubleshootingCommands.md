@@ -583,11 +583,9 @@ $ oc get pods
 
 
 ```
-[root@testocp42 ~]# oc get pods
-NAME                          READY   STATUS             RESTARTS   AGE
-postgresq-96-rhel7-2-deploy   1/1     Running            0          77s
-postgresq-96-rhel7-2-ktj95    1/1     Running   0          74s
-
+NAME                           READY   STATUS      RESTARTS   AGE
+postgresq-96-rhel7-2-deploy   0/1     Completed   0          2m48s
+postgresq-96-rhel7-2-m6rcm    1/1     Running     0          2m45s
 ```
 
 

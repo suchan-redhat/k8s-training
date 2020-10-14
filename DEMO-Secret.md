@@ -358,8 +358,7 @@ Services:
 
 
 
-###  \
-2. Expose the application service so that it can be accessed from out side the cluster.
+### 2. Expose the application service so that it can be accessed from out side the cluster.
 
 
 ```

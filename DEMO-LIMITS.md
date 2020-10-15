@@ -322,3 +322,273 @@ deployment.apps "hello-limit" deleted
 ```
 
 
+
+## Deploy a Second APP to test memory usage
+
+
+### 1. Prepare the below yaml and save it to /tmp/loadmem.yaml
+
+
+```
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: loadtest
+    name: loadtest
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: loadtest
+    strategy: {}
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: loadtest
+      spec:
+        containers:
+        - image: quay.io/redhattraining/loadtest:v1.0
+          name: loadtest
+          resources:
+            requests:
+              cpu: "100m"
+              memory: 20M
+            limits:
+              cpu: "500m"
+              memory: 200M
+  status: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: loadtest
+    name: loadtest
+  spec:
+    ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: loadtest
+  status:
+    loadBalancer: {}
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    annotations:
+      haproxy.router.openshift.io/timeout: 60s
+    creationTimestamp: null
+    labels:
+      app: loadtest
+    name: loadtest
+  spec:
+    host: ""
+    port:
+      targetPort: 8080
+    subdomain: ""
+    to:
+      kind: ""
+      name: loadtest
+      weight: null
+  status:
+    ingress: null
+kind: List
+metadata: {}
+```
+
+
+
+### 2. Create the application using the prepared resource 
+
+
+```
+$  oc create --save-config  -f /tmp/loadmem.yaml
+```
+
+
+
+```
+deployment.apps/loadtest created
+service/loadtest created
+route.route.openshift.io/loadtest created
+```
+
+
+
+### 3. Obtain the route of the load app
+
+
+```
+$ oc get route
+```
+
+
+
+```
+NAME       HOST/PORT                                                                                      PATH   SERVICES   PORT   TERMINATION   WILDCARD
+loadtest   loadtest-schedule-limit-sunny.apps.cluster-sunlife-2bfb.sunlife-2bfb.sandbox1899.opentlc.com          loadtest   8080                 None
+```
+
+
+
+### 4. Open two terminal run the below commands respectively
+
+
+```
+$ watch oc get pods
+```
+
+
+
+```
+$ watch oc adm top pod
+```
+
+
+
+## Generate some loading by application API
+
+
+### 1. Use the application API to increase the memory loadby 150MB for 60 seconds
+
+
+```
+$ curl -X GET  http://loadtest-schedule-limit-sunny.apps.cluster-sunlife-2bfb.sunlife-2bfb.sandbox1899.opentlc.com/api/loadtest/v1/mem/150/60
+```
+
+
+
+### 2. Observe the output of the two screen
+
+
+## Generate loading by application API which container cannot handle
+
+
+### 1. Use the application API to increase the memory loadby 150MB for 60 seconds
+
+
+```
+$ curl -X GET  http://loadtest-schedule-limit-sunny.apps.cluster-sunlife-2bfb.sunlife-2bfb.sandbox1899.opentlc.com/api/loadtest/v1/mem/200/60
+```
+
+
+
+### 2. Observe the output of the two screen
+
+
+```
+NAME                        READY   STATUS      RESTARTS   AGE
+loadtest-58d967ffbb-wpslj   0/1     OOMKilled   3          10m
+```
+
+
+
+## Create quota for the project
+
+
+### 1. Login to OCP as administrator
+
+
+```
+$ oc login -u opentlc-mgr -p 'r3dh4t1!' https://api.cluster-sunlife-2bfb.sunlife-2bfb.sandbox1899.opentlc.com:6443
+```
+
+
+
+```
+The server uses a certificate signed by an unknown authority.
+You can bypass the certificate check, but any data you send to the server could be intercepted by others.
+Use insecure connections? (y/n): y
+
+Login successful.
+
+You have access to 273 projects, the list has been suppressed. You can list all projects with 'oc projects'
+
+Using project "default".
+```
+
+
+
+### 2. Create a quota for project schedule-limit-sunny
+
+
+```
+$ oc create quota project-quota  --hard cpu="3",memory="1G",configmaps="3"  -n schedule-limit-sunny
+
+```
+
+
+
+```
+$ resourcequota/project-quota created
+```
+
+
+
+## As developer try to exceed the configmap quota
+
+
+### 1. Login to OCP as Developer
+
+
+```
+$ oc login -u user1 -p 'r3dh4t1!' https://api.cluster-sunlife-2bfb.sunlife-2bfb.sandbox1899.opentlc.com:6443
+```
+
+
+
+```
+The server uses a certificate signed by an unknown authority.
+You can bypass the certificate check, but any data you send to the server could be intercepted by others.
+Use insecure connections? (y/n): y
+
+Login successful.
+
+You have access to 273 projects, the list has been suppressed. You can list all projects with 'oc projects'
+
+Using project "default".
+```
+
+
+
+### 2. Use a loop to create 4 configmap
+
+
+```
+$  for X in {1..4}; do oc create configmap my-config${X} --from-literal key${X}=value${X}; done
+
+```
+
+
+
+```
+configmap/my-config1 created
+configmap/my-config2 created
+configmap/my-config3 created
+Error from server (Forbidden): configmaps "my-config4" is forbidden: exceeded quota: project-quota, requested: configmaps=1, used: configmaps=3, limited: configmaps=3
+
+You have access to 273 projects, the list has been suppressed. You can list all projects with 'oc projects'
+
+Using project "default".
+```
+
+
+
+## Clean up
+
+
+```
+$ oc login -u opentlc-mgr -p 'r3dh4t1!' https://api.cluster-sunlife-2bfb.sunlife-2bfb.sandbox1899.opentlc.com:6443
+
+$ oc delete resourcequota project-quota
+
+$ oc delete project schedule-limit-sunny
+```
+
+

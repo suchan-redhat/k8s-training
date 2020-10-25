@@ -5,7 +5,7 @@
 # Advanced Dockerfile Instructions
 
 
-## Login to the OpenShift cluster and create the network-sdn-&lt;urname> project.
+## Review the application source code
 
 
 ### 1. Review the below Dockfile as the prebuilt image in Quay.io

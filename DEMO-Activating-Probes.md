@@ -238,7 +238,7 @@ ping /ready => pong [ready]
 
 
 ```
-$ xxxxs
+$ curl http://<route>/flip?op=kill
 ```
 
 

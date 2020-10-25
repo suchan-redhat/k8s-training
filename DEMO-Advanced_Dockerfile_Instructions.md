@@ -83,7 +83,7 @@ $ cat ~/sunlife-training/developer-src/container-build/src/index.html
 
 
 
-## Build and deploy a container to an OpenShift clustera
+## Build and deploy a container to an OpenShift cluster
 
 
 ### 1. Login to OCP as developer 

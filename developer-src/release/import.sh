@@ -38,7 +38,7 @@ if [ "$HOOK_RETRIES" = 0 ]; then
 fi
 
 # Run the SQL script
-if mysql -h$MYSQL_SERVICE_HOST -u$MYSQL_USER -p$MYSQL_PASSWORD -P3306 $MYSQL_DATABASE < /tmp/users.sql
+if mysql -h$MYSQL_SERVICE_HOST -u$MYSQL_USER -p$MYSQL_PASSWORD -P3306 $MYSQL_DATABASE < /tmp/user.sql
 then
   echo 'Database initialized successfully'
 else

@@ -1,0 +1,10 @@
+{
+	"auths": {
+		"https://index.docker.io/v1/": {
+			"auth": "dGNjc3Vubnk6YXBvbGV0aWNzQERPQ0tFUjIwMjA="
+		}
+	},
+	"HttpHeaders": {
+		"User-Agent": "Docker-Client/19.03.8 (linux)"
+	}
+}

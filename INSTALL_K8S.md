@@ -14,6 +14,12 @@ sudo apt install docker.io
 sudo systemctl start docker
 sudo systemctl enable docker
 ```
+```bash
+sudo yum install docker -y
+sudo systemctl start docker
+sudo systemctl enable docker
+```
+
 ### Installing kubeadm, kubelet and kubectl
 ```bash
 sudo apt-get update && sudo apt-get install -y apt-transport-https curl
@@ -86,6 +92,10 @@ kubectl get pods --all-namespaces
 ```
 
 kubectl create -f https://haproxy-ingress.github.io/resources/haproxy-ingress.yaml
+
+#### nginx
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.41.2/deploy/static/provider/cloud/deploy.yaml
+
 
 kubectl label node k8s-master role=ingress-controller
 
